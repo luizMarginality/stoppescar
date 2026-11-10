@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Stop do LinkedIn</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500..700&family=DM+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#12203F;--paper:#FBF8F1;--sun:#FFC93C;--pink:#FF5C8A;--lime:#B8F34A;--cyan:#3DD6F5;--lilac:#B9A6FF;--orange:#FF8A3D;--red:#F2545B}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'DM Sans',Arial,sans-serif;background:var(--lilac);color:var(--ink);min-height:100vh;padding:20px}
+  h1,h2,.fred{font-family:'Fredoka',Arial,sans-serif}
+  .wrap{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1.4fr 1fr;gap:20px}
+  @media (max-width:860px){.wrap{grid-template-columns:1fr}}
+  header{max-width:1200px;margin:0 auto 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  header h1{font-size:clamp(28px,5vw,44px);font-weight:700}
+  .pill{background:var(--ink);color:var(--paper);font-family:'Fredoka';font-weight:700;font-size:14px;letter-spacing:2px;text-transform:uppercase;padding:6px 16px;border-radius:999px;transform:rotate(-3deg)}
+  .card{background:var(--paper);border:4px solid var(--ink);border-radius:24px;box-shadow:8px 8px 0 var(--ink);padding:20px}
+  .card h2{font-size:22px;font-weight:700;margin-bottom:12px}
+  .letter{font-family:'Fredoka';font-weight:700;font-size:clamp(140px,26vw,280px);line-height:1;text-align:center;background:var(--sun);border:4px solid var(--ink);border-radius:24px;padding:10px 0 20px;margin-bottom:16px;transition:transform .15s}
+  .letter.spin{transform:scale(.92) rotate(-4deg)}
+  .timer{font-family:'Fredoka';font-weight:700;font-size:clamp(64px,12vw,120px);text-align:center;line-height:1;padding:8px 0}
+  .timer.warn{color:var(--red)}
+  .timer.over{animation:blink .5s steps(2) infinite}
+  @keyframes blink{50%{opacity:.2}}
+  .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:12px}
+  button{font-family:'Fredoka';font-weight:700;font-size:20px;color:var(--ink);background:var(--paper);border:3px solid var(--ink);border-radius:999px;padding:10px 22px;box-shadow:4px 4px 0 var(--ink);cursor:pointer}
+  button:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
+  button.big{background:var(--pink);font-size:26px;padding:14px 30px}
+  button.go{background:var(--lime)}
+  button.stop{background:var(--red);color:var(--paper)}
+  button.sm{font-size:16px;padding:6px 12px;box-shadow:3px 3px 0 var(--ink)}
+  .used{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;justify-content:center}
+  .used span{font-family:'Fredoka';font-weight:700;width:34px;height:34px;line-height:28px;text-align:center;border:3px solid var(--ink);border-radius:8px;background:var(--paper)}
+  .used span.out{background:var(--ink);color:var(--paper);opacity:.35}
+  .used span.now{background:var(--sun)}
+  .small{font-size:14px;color:#4B5670;text-align:center;margin-top:8px}
+  .time-set{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+  .time-set button{font-size:16px;padding:6px 14px}
+  .time-set button.on{background:var(--cyan)}
+  .cols{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:14px}
+  .cols span{background:var(--cyan);border:3px solid var(--ink);border-radius:999px;padding:4px 14px;font-weight:700;font-size:15px}
+  form{display:flex;gap:8px;margin-bottom:14px}
+  input{flex:1;font:inherit;font-size:18px;border:3px solid var(--ink);border-radius:14px;padding:10px 14px;background:#fff;min-width:0}
+  .team{display:flex;align-items:center;gap:10px;border:3px solid var(--ink);border-radius:16px;padding:10px 12px;margin-bottom:10px;background:#fff}
+  .team.lead{background:var(--sun)}
+  .team .name{flex:1;font-weight:700;font-size:20px;word-break:break-word}
+  .team .pts{flex:none;font-family:'Fredoka';font-weight:700;font-size:28px;width:96px;text-align:center;padding:4px 6px;border:3px solid var(--ink);border-radius:12px;background:var(--paper);color:var(--ink)}
+  .team .btns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+  .rules{font-size:14px;line-height:1.5;margin-top:12px;color:#4B5670}
+  .empty{color:#4B5670;text-align:center;padding:16px 0}
+</style>
+</head>
+<body>
+<header>
+  <span class="pill">Brincadeira</span>
+  <h1>Stop do LinkedIn</h1>
+</header>
+<div class="wrap">
+  <section class="card">
+    <div id="letter" class="letter">?</div>
+    <div class="row"><button id="draw" class="big">Sortear letra</button></div>
+    <div id="timer" class="timer">2:00</div>
+    <div class="time-set" id="timeSet">
+      <button data-s="60">1 min</button><button data-s="90">1:30</button><button data-s="120" class="on">2 min</button><button data-s="180">3 min</button>
+    </div>
+    <div class="row">
+      <button id="start" class="go">Começar</button>
+      <button id="stopBtn" class="stop">STOP!</button>
+      <button id="reset">Zerar tempo</button>
+    </div>
+    <div class="cols"><span>Profissão</span><span>Habilidade</span><span>Qualidade</span><span>Curso</span><span>App ou ferramenta</span></div>
+    <div class="used" id="used"></div>
+    <p class="small">Letras difíceis (K, W, X, Y) ficam de fora. Cada letra sai uma vez só. <button id="resetLetters" class="sm">Recomeçar letras</button></p>
+  </section>
+  <section class="card">
+    <h2>Times e pontos</h2>
+    <form id="addForm"><input id="teamName" placeholder="Nome do time" maxlength="30" autocomplete="off"><button type="submit" class="go">Adicionar</button></form>
+    <div id="teams"></div>
+    <p class="rules">Pontos do Stop: <b>10</b> pra resposta que só o seu time escreveu, <b>5</b> se outro time repetiu, <b>0</b> em branco. Dá pra tocar no número e digitar os pontos direto. O time na frente fica amarelo.</p>
+    <div class="row"><button id="zeroPts" class="sm">Zerar pontos</button><button id="clearTeams" class="sm">Apagar times</button></div>
+  </section>
+</div>
+<script>
+(function(){
+  const ALPHA = "ABCDEFGHIJLMNOPQRSTUVZ".split(""); // sem K, W, X, Y
+  const $ = id => document.getElementById(id);
+  const store = {
+    get(k, d){ try{ const v = localStorage.getItem("stop_"+k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
+    set(k, v){ try{ localStorage.setItem("stop_"+k, JSON.stringify(v)); }catch(e){} }
+  };
+  let used = store.get("used", []);
+  let current = store.get("current", null);
+  let teams = store.get("teams", []);
+  let duration = store.get("duration", 120);
+  let left = duration, tick = null, endAt = 0, audio = null;
+
+  function beep(freq, ms, when){
+    try{
+      audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+      const o = audio.createOscillator(), g = audio.createGain();
+      o.frequency.value = freq; o.type = "square"; g.gain.value = 0.15;
+      o.connect(g); g.connect(audio.destination);
+      const t = audio.currentTime + (when || 0);
+      o.start(t); o.stop(t + ms/1000);
+    }catch(e){}
+  }
+  function renderUsed(){
+    $("used").innerHTML = ALPHA.map(l => `<span class="${l===current?'now':used.includes(l)?'out':''}">${l}</span>`).join("");
+    $("letter").textContent = current || "?";
+  }
+  function draw(){
+    let pool = ALPHA.filter(l => !used.includes(l));
+    if(!pool.length){ alertFree("Todas as letras já saíram. Toque em Recomeçar letras."); return; }
+    const btn = $("draw"); btn.disabled = true;
+    let n = 0; const steps = 14;
+    const spin = setInterval(() => {
+      $("letter").textContent = pool[Math.floor(Math.random()*pool.length)];
+      $("letter").classList.toggle("spin");
+      beep(600 + n*20, 40);
+      if(++n >= steps){
+        clearInterval(spin);
+        current = pool[Math.floor(Math.random()*pool.length)];
+        used.push(current); store.set("used", used); store.set("current", current);
+        $("letter").classList.remove("spin");
+        renderUsed(); beep(1000, 200);
+        btn.disabled = false;
+        resetTimer(); startTimer();
+      }
+    }, 70);
+  }
+  function alertFree(msg){ $("letter").textContent = "!"; $("timer").textContent = ""; $("draw").textContent = "Acabaram as letras"; }
+  function fmt(s){ s = Math.max(0, Math.ceil(s)); return Math.floor(s/60) + ":" + String(s%60).padStart(2,"0"); }
+  function paint(){
+    const t = $("timer"); t.textContent = fmt(left);
+    t.classList.toggle("warn", left <= 10);
+    t.classList.toggle("over", left <= 0);
+  }
+  function startTimer(){
+    if(tick || left <= 0) return;
+    endAt = Date.now() + left*1000;
+    tick = setInterval(() => {
+      const prev = Math.ceil(left);
+      left = (endAt - Date.now())/1000;
+      if(Math.ceil(left) !== prev && left > 0 && left <= 5) beep(880, 120);
+      if(left <= 0){ left = 0; stopTimer(); timeUp(); }
+      paint();
+    }, 100);
+    $("start").textContent = "Pausar";
+  }
+  function stopTimer(){ clearInterval(tick); tick = null; $("start").textContent = "Começar"; }
+  function resetTimer(){ stopTimer(); left = duration; paint(); }
+  function timeUp(){ beep(440, 500); beep(330, 700, 0.55); $("timer").textContent = "TEMPO!"; }
+  function stopCall(){ stopTimer(); beep(1200, 150); beep(900, 300, 0.18); $("timer").textContent = "STOP!"; $("timer").classList.add("over"); }
+
+  $("draw").onclick = draw;
+  $("start").onclick = () => tick ? stopTimer() : startTimer();
+  $("stopBtn").onclick = stopCall;
+  $("reset").onclick = resetTimer;
+  $("resetLetters").onclick = () => { $("draw").textContent = "Sortear letra"; used = []; current = null; store.set("used", used); store.set("current", null); renderUsed(); };
+  document.querySelectorAll("#timeSet button").forEach(b => {
+    if(+b.dataset.s === duration) { document.querySelectorAll("#timeSet button").forEach(x=>x.classList.remove("on")); b.classList.add("on"); }
+    b.onclick = () => {
+      duration = +b.dataset.s; store.set("duration", duration);
+      document.querySelectorAll("#timeSet button").forEach(x => x.classList.toggle("on", x === b));
+      resetTimer();
+    };
+  });
+
+  function esc(s){ return s.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+  function renderTeams(){
+    store.set("teams", teams);
+    if(!teams.length){ $("teams").innerHTML = '<p class="empty">Adicione os times pra marcar os pontos.</p>'; return; }
+    const max = Math.max(...teams.map(t => t.p));
+    $("teams").innerHTML = teams.map((t, i) => `
+      <div class="team ${max > 0 && t.p === max ? 'lead' : ''}">
+        <div class="name">${esc(t.n)}</div>
+        <div class="btns">
+          <button class="sm" data-i="${i}" data-d="10">+10</button>
+          <button class="sm" data-i="${i}" data-d="5">+5</button>
+          <button class="sm" data-i="${i}" data-d="-5">−5</button>
+        </div>
+        <input class="pts" type="number" inputmode="numeric" min="0" step="1" value="${t.p}" data-i="${i}" aria-label="Pontos de ${esc(t.n)}">
+      </div>`).join("");
+    $("teams").querySelectorAll("input.pts").forEach(inp => {
+      inp.onfocus = () => inp.select();
+      inp.onchange = () => { const v = parseInt(inp.value, 10); teams[+inp.dataset.i].p = isNaN(v) || v < 0 ? 0 : v; renderTeams(); };
+      inp.onkeydown = e => { if(e.key === "Enter") inp.blur(); };
+    });
+    $("teams").querySelectorAll("button").forEach(b => b.onclick = () => {
+      const t = teams[+b.dataset.i]; t.p = Math.max(0, t.p + +b.dataset.d); renderTeams();
+    });
+  }
+  $("addForm").onsubmit = e => {
+    e.preventDefault();
+    const n = $("teamName").value.trim();
+    if(n){ teams.push({n, p:0}); $("teamName").value = ""; renderTeams(); }
+  };
+  $("zeroPts").onclick = () => { teams.forEach(t => t.p = 0); renderTeams(); };
+  $("clearTeams").onclick = () => { teams = []; renderTeams(); };
+
+  renderUsed(); renderTeams(); resetTimer();
+})();
+</script>
+</body>
+</html>
